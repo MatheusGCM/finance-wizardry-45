@@ -10,7 +10,7 @@ const Index = () => {
     <div className="min-h-screen bg-finance-dark overflow-x-hidden">
       <Header />
       
-      <main className="pt-28 md:pt-32 pb-12 md:pb-16">
+      <main className="pt-40 md:pt-44 pb-12 md:pb-16">
         <Summary />
         <SearchForm />
         <TransactionsTable />
