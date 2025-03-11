@@ -1,4 +1,3 @@
-
 import { ReactNode, createContext, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -22,6 +21,7 @@ interface TransactionContextType {
   transactions: Transaction[];
   filteredTransactions: Transaction[];
   createTransaction: (data: CreateTransactionInput) => void;
+  deleteTransaction: (id: number) => void;
   searchTransactions: (query: string) => void;
   isTransactionModalOpen: boolean;
   openTransactionModal: () => void;
@@ -92,6 +92,13 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
     toast.success("Transação cadastrada com sucesso!");
   }, []);
   
+  const deleteTransaction = useCallback((id: number) => {
+    setTransactions(state => state.filter(transaction => transaction.id !== id));
+    setFilteredTransactions(state => state.filter(transaction => transaction.id !== id));
+    
+    toast.success("Transação removida com sucesso!");
+  }, []);
+  
   const searchTransactions = useCallback(
     (query: string) => {
       const lowerCaseQuery = query.toLowerCase().trim();
@@ -126,6 +133,7 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
         transactions,
         filteredTransactions,
         createTransaction,
+        deleteTransaction,
         searchTransactions,
         isTransactionModalOpen,
         openTransactionModal,

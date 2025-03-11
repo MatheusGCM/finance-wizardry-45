@@ -1,11 +1,11 @@
 
-import { CalendarDays, Tag } from "lucide-react";
+import { CalendarDays, Tag, Trash2 } from "lucide-react";
 import { useContext } from "react";
 import { TransactionContext } from "../contexts/TransactionContext";
 import { currencyFormatter, dateFormatter } from "../utils/formatter";
 
 export const TransactionsTable = () => {
-  const { filteredTransactions: transactions } = useContext(TransactionContext);
+  const { filteredTransactions: transactions, deleteTransaction } = useContext(TransactionContext);
 
   return (
     <div className="w-full max-w-7xl mx-auto mt-4 md:mt-6 px-4 md:px-8 pb-16">
@@ -37,6 +37,17 @@ export const TransactionsTable = () => {
                       <span>{dateFormatter.format(new Date(transaction.createdAt))}</span>
                     </div>
                   </div>
+                </div>
+                
+                <div className="mt-3 md:mt-4 flex justify-end">
+                  <button 
+                    onClick={() => deleteTransaction(transaction.id)}
+                    className="text-finance-muted hover:text-finance-expense transition-colors p-1 rounded-full hover:bg-finance-expense/10"
+                    aria-label="Excluir transação"
+                    title="Excluir transação"
+                  >
+                    <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
+                  </button>
                 </div>
               </div>
             ))}
