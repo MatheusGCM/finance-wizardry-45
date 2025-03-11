@@ -16,7 +16,7 @@ export const SearchForm = () => {
   }, [query, searchTransactions]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto mt-6 px-6 md:px-8">
+    <div className="w-full max-w-7xl mx-auto mt-4 md:mt-6 px-4 md:px-8">
       <div className="flex items-center justify-between gap-4">
         <div className="relative flex-1">
           <input 

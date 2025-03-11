@@ -80,6 +80,8 @@
   
   input, select, textarea {
     @apply focus:outline-none focus:ring-2 focus:ring-finance-income/50 transition-all duration-200;
+    -webkit-appearance: none;
+    font-size: 16px; /* Prevent zoom on iOS */
   }
   
   button {
@@ -99,6 +101,17 @@
   
   .btn-finance {
     @apply bg-finance-button text-white font-medium rounded-lg px-6 py-3 hover:bg-finance-button/90 active:scale-[0.98] shadow-md hover:shadow-lg transition-all duration-200;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .card-finance {
+    @apply p-4;
+  }
+  
+  .input-finance, .btn-finance {
+    @apply px-4 py-2.5;
   }
 }
 
