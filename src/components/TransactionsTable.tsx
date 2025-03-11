@@ -1,14 +1,16 @@
-
 import { CalendarDays, Grid3X3, List, Tag, Trash2 } from "lucide-react";
 import { useContext, useState } from "react";
 import { TransactionContext } from "../contexts/TransactionContext";
 import { currencyFormatter, dateFormatter } from "../utils/formatter";
+import { useIsMobile } from "../hooks/use-mobile";
 
 export const TransactionsTable = () => {
   const { filteredTransactions: transactions, deleteTransaction } = useContext(TransactionContext);
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
+  const isMobile = useIsMobile();
 
-  // Separate transactions by type
+  const effectiveViewMode = isMobile ? "grid" : viewMode;
+
   const incomeTransactions = transactions.filter(transaction => transaction.type === "income");
   const outcomeTransactions = transactions.filter(transaction => transaction.type === "outcome");
 
@@ -124,24 +126,24 @@ export const TransactionsTable = () => {
 
   return (
     <div className="w-full max-w-7xl mx-auto mt-4 md:mt-6 px-4 md:px-8 pb-16">
-      {transactions.length > 0 && (
+      {transactions.length > 0 && !isMobile && (
         <div className="flex items-center justify-end mb-4">
           <div className="bg-finance-card rounded-lg p-1 flex">
             <button
               onClick={() => setViewMode("list")}
-              className={`p-1.5 rounded ${viewMode === "list" ? "bg-finance-income/20" : ""}`}
+              className={`p-1.5 rounded ${effectiveViewMode === "list" ? "bg-finance-income/20" : ""}`}
               aria-label="Visualização em lista"
               title="Visualização em lista"
             >
-              <List className={`w-4 h-4 ${viewMode === "list" ? "text-finance-income" : "text-finance-muted"}`} />
+              <List className={`w-4 h-4 ${effectiveViewMode === "list" ? "text-finance-income" : "text-finance-muted"}`} />
             </button>
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-1.5 rounded ${viewMode === "grid" ? "bg-finance-income/20" : ""}`}
+              className={`p-1.5 rounded ${effectiveViewMode === "grid" ? "bg-finance-income/20" : ""}`}
               aria-label="Visualização em grid"
               title="Visualização em grid"
             >
-              <Grid3X3 className={`w-4 h-4 ${viewMode === "grid" ? "text-finance-income" : "text-finance-muted"}`} />
+              <Grid3X3 className={`w-4 h-4 ${effectiveViewMode === "grid" ? "text-finance-income" : "text-finance-muted"}`} />
             </button>
           </div>
         </div>
@@ -149,7 +151,7 @@ export const TransactionsTable = () => {
       
       <div className="overflow-hidden">
         {transactions.length > 0 ? (
-          viewMode === "list" ? (
+          effectiveViewMode === "list" ? (
             <div>
               {renderTransactionsList(incomeTransactions, "Entradas", true)}
               {renderTransactionsList(outcomeTransactions, "Saídas", false)}
