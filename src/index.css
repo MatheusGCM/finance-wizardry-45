@@ -1,3 +1,6 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -33,22 +36,6 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
@@ -79,14 +66,6 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -94,8 +73,50 @@
   * {
     @apply border-border;
   }
-
   body {
-    @apply bg-background text-foreground;
+    @apply bg-finance-dark text-finance-text font-inter antialiased;
+    font-feature-settings: "ss01" on, "ss02" on, "cv01" on, "cv03" on;
   }
+  
+  input, select, textarea {
+    @apply focus:outline-none focus:ring-2 focus:ring-finance-income/50 transition-all duration-200;
+  }
+  
+  button {
+    @apply transition-all duration-200 ease-in-out;
+  }
+}
+
+/* Custom classes */
+@layer components {
+  .card-finance {
+    @apply bg-finance-card rounded-xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl;
+  }
+  
+  .input-finance {
+    @apply bg-finance-dark/80 rounded-lg border border-finance-card/50 px-4 py-3 text-finance-text w-full;
+  }
+  
+  .btn-finance {
+    @apply bg-finance-button text-white font-medium rounded-lg px-6 py-3 hover:bg-finance-button/90 active:scale-[0.98] shadow-md hover:shadow-lg transition-all duration-200;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
