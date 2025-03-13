@@ -1,146 +1,201 @@
-import { ReactNode, createContext, useCallback, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from "react";
+import {
+  type Transaction,
+  type CreateTransactionInput,
+  transactionService,
+} from "../services/transactionService";
 import { toast } from "sonner";
-
-interface Transaction {
-  id: number;
-  description: string;
-  type: "income" | "outcome";
-  amount: number;
-  category: string;
-  createdAt: string;
-}
-
-interface CreateTransactionInput {
-  description: string;
-  type: "income" | "outcome";
-  amount: number;
-  category: string;
-}
+import { useAuth } from "../hooks/useAuth";
 
 interface TransactionContextType {
   transactions: Transaction[];
-  filteredTransactions: Transaction[];
-  createTransaction: (data: CreateTransactionInput) => void;
-  deleteTransaction: (id: number) => void;
-  searchTransactions: (query: string) => void;
-  isTransactionModalOpen: boolean;
-  openTransactionModal: () => void;
-  closeTransactionModal: () => void;
+  isLoading: boolean;
+  error: string | null;
+  addTransaction: (transaction: CreateTransactionInput) => Promise<void>;
+  updateTransaction: (
+    id: number,
+    transaction: CreateTransactionInput
+  ) => Promise<void>;
+  deleteTransaction: (id: number) => Promise<void>;
+  refreshTransactions: () => Promise<void>;
+  searchTransactions: (query: string) => Promise<void>;
+  setManualLoading: (isLoading: boolean) => void;
 }
 
-export const TransactionContext = createContext({} as TransactionContextType);
+const TransactionContext = createContext<TransactionContextType | undefined>(
+  undefined
+);
 
-// Local storage key for persisting transactions
-const LOCAL_STORAGE_KEY = "@dt-money:transactions-1.0.0";
+export const TransactionProvider = ({ children }: { children: ReactNode }) => {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [manualLoadingMode, setManualLoadingMode] = useState(false);
+  const { user } = useAuth();
 
-// Load transactions from localStorage or use initial demo data
-const loadTransactions = (): Transaction[] => {
-  const storedTransactions = localStorage.getItem(LOCAL_STORAGE_KEY);
-  
-  if (storedTransactions) {
-    return JSON.parse(storedTransactions);
-  }
-  
-  // Initial demo data
-  return [
-    {
-      id: 1,
-      description: "Desenvolvimento de site",
-      type: "income",
-      amount: 12000,
-      category: "Venda",
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 2,
-      description: "Hambúrguer",
-      type: "outcome",
-      amount: 59.9,
-      category: "Alimentação",
-      createdAt: new Date().toISOString(),
-    },
-  ];
-};
-
-interface TransactionProviderProps {
-  children: ReactNode;
-}
-
-export function TransactionProvider({ children }: TransactionProviderProps) {
-  const [transactions, setTransactions] = useState<Transaction[]>(loadTransactions);
-  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>(loadTransactions);
-  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
-  
-  // Save transactions to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(transactions));
-  }, [transactions]);
-  
-  const createTransaction = useCallback((data: CreateTransactionInput) => {
-    const newTransaction: Transaction = {
-      id: Math.floor(Math.random() * 1000000),
-      description: data.description,
-      type: data.type,
-      amount: data.amount,
-      category: data.category,
-      createdAt: new Date().toISOString(),
-    };
-    
-    setTransactions(state => [newTransaction, ...state]);
-    setFilteredTransactions(state => [newTransaction, ...state]);
-    
-    toast.success("Transação cadastrada com sucesso!");
+  const setManualLoading = useCallback((loading: boolean) => {
+    setManualLoadingMode(loading);
   }, []);
-  
-  const deleteTransaction = useCallback((id: number) => {
-    setTransactions(state => state.filter(transaction => transaction.id !== id));
-    setFilteredTransactions(state => state.filter(transaction => transaction.id !== id));
-    
-    toast.success("Transação removida com sucesso!");
-  }, []);
-  
-  const searchTransactions = useCallback(
-    (query: string) => {
-      const lowerCaseQuery = query.toLowerCase().trim();
-      
-      if (!lowerCaseQuery) {
-        setFilteredTransactions(transactions);
-        return;
-      }
-      
-      const filtered = transactions.filter(transaction => 
-        transaction.description.toLowerCase().includes(lowerCaseQuery) ||
-        transaction.category.toLowerCase().includes(lowerCaseQuery) ||
-        String(transaction.amount).includes(lowerCaseQuery)
+
+  const fetchTransactions = useCallback(async () => {
+    if (!user) {
+      setTransactions([]);
+      setIsLoading(false);
+      return;
+    }
+
+    if (manualLoadingMode) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const data = await transactionService.getTransactions();
+      setTransactions(data);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Erro ao carregar transações"
       );
-      
-      setFilteredTransactions(filtered);
-    },
-    [transactions]
-  );
-  
-  const openTransactionModal = useCallback(() => {
-    setIsTransactionModalOpen(true);
-  }, []);
-  
-  const closeTransactionModal = useCallback(() => {
-    setIsTransactionModalOpen(false);
-  }, []);
+      toast.error("Erro ao carregar transações");
+    } finally {
+      if (!manualLoadingMode) {
+        setIsLoading(false);
+      }
+    }
+  }, [user, manualLoadingMode]);
+
+  useEffect(() => {
+    setIsLoading(manualLoadingMode);
+  }, [manualLoadingMode]);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
+
+  const addTransaction = async (transaction: CreateTransactionInput) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const newTransaction = await transactionService.createTransaction(
+        transaction
+      );
+      setTransactions((prev) => [newTransaction, ...prev]);
+      toast.success("Transação adicionada com sucesso!");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Erro ao adicionar transação"
+      );
+      toast.error("Erro ao adicionar transação");
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateTransaction = async (
+    id: number,
+    transaction: CreateTransactionInput
+  ) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const updatedTransaction = await transactionService.updateTransaction(
+        id,
+        transaction
+      );
+      setTransactions((prev) =>
+        prev.map((item) => (item.id === id ? updatedTransaction : item))
+      );
+      toast.success("Transação atualizada com sucesso!");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Erro ao atualizar transação"
+      );
+      toast.error("Erro ao atualizar transação");
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteTransaction = async (id: number) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await transactionService.deleteTransaction(id);
+      setTransactions((prev) => prev.filter((item) => item.id !== id));
+      toast.success("Transação excluída com sucesso!");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Erro ao excluir transação"
+      );
+      toast.error("Erro ao excluir transação");
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const refreshTransactions = async () => {
+    await fetchTransactions();
+  };
+
+  const searchTransactions = async (query: string) => {
+    if (!query.trim()) {
+      return refreshTransactions();
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const data = await transactionService.searchTransactions(query);
+      setTransactions(data);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Erro ao pesquisar transações"
+      );
+      toast.error("Erro ao pesquisar transações");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <TransactionContext.Provider
       value={{
         transactions,
-        filteredTransactions,
-        createTransaction,
+        isLoading,
+        error,
+        addTransaction,
+        updateTransaction,
         deleteTransaction,
+        refreshTransactions,
         searchTransactions,
-        isTransactionModalOpen,
-        openTransactionModal,
-        closeTransactionModal,
+        setManualLoading,
       }}
     >
       {children}
     </TransactionContext.Provider>
   );
-}
+};
+
+export const useTransactions = () => {
+  const context = useContext(TransactionContext);
+  if (context === undefined) {
+    throw new Error(
+      "useTransactions deve ser usado dentro de um TransactionProvider"
+    );
+  }
+  return context;
+};
