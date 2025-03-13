@@ -8,18 +8,22 @@ const Toaster = ({ ...props }: ToasterProps) => {
 
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
+      theme="dark"
       className="toaster group"
       toastOptions={{
         classNames: {
           toast:
-            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
-          description: "group-[.toast]:text-muted-foreground",
+            "group toast group-[.toaster]:bg-finance-card group-[.toaster]:text-finance-text group-[.toaster]:border-finance-card/50 group-[.toaster]:shadow-lg",
+          description: "group-[.toast]:text-finance-muted",
           actionButton:
-            "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
+            "group-[.toast]:bg-finance-income group-[.toast]:text-white",
           cancelButton:
-            "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+            "group-[.toast]:bg-finance-card/80 group-[.toast]:text-finance-muted",
+          success: "group-[.toast]:!bg-finance-income/10 group-[.toast]:!border-finance-income/20",
+          error: "group-[.toast]:!bg-finance-expense/10 group-[.toast]:!border-finance-expense/20",
+          info: "group-[.toast]:!bg-finance-card group-[.toast]:!border-finance-card/50",
         },
+        duration: 4000,
       }}
       {...props}
     />

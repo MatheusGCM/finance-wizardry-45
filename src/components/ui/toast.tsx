@@ -27,9 +27,11 @@ const toastVariants = cva(
   {
     variants: {
       variant: {
-        default: "border bg-background text-foreground",
+        default: "border border-finance-card/50 bg-finance-card text-finance-text",
         destructive:
-          "destructive group border-destructive bg-destructive text-destructive-foreground",
+          "border border-finance-expense/20 bg-finance-expense/10 text-finance-text",
+        success:
+          "border border-finance-income/20 bg-finance-income/10 text-finance-text",
       },
     },
     defaultVariants: {
@@ -60,7 +62,7 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive",
+      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium transition-colors hover:bg-finance-card focus:outline-none focus:ring-2 focus:ring-finance-income/50 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-finance-expense/30 group-[.destructive]:hover:border-finance-expense/30 group-[.destructive]:hover:bg-finance-expense group-[.destructive]:hover:text-white group-[.destructive]:focus:ring-finance-expense group-[.success]:border-finance-income/30 group-[.success]:hover:border-finance-income/30 group-[.success]:hover:bg-finance-income group-[.success]:hover:text-white group-[.success]:focus:ring-finance-income",
       className
     )}
     {...props}
@@ -75,10 +77,9 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
+      "absolute right-2 top-2 rounded-md p-1 text-finance-muted opacity-0 transition-opacity hover:text-finance-text focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-finance-expense/70 group-[.destructive]:hover:text-finance-expense group-[.destructive]:focus:ring-finance-expense group-[.success]:text-finance-income/70 group-[.success]:hover:text-finance-income group-[.success]:focus:ring-finance-income",
       className
     )}
-    toast-close=""
     {...props}
   >
     <X className="h-4 w-4" />
@@ -92,7 +93,7 @@ const ToastTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Title
     ref={ref}
-    className={cn("text-sm font-semibold", className)}
+    className={cn("text-sm font-semibold text-finance-text", className)}
     {...props}
   />
 ))
@@ -104,7 +105,7 @@ const ToastDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Description
     ref={ref}
-    className={cn("text-sm opacity-90", className)}
+    className={cn("text-sm text-finance-muted", className)}
     {...props}
   />
 ))
