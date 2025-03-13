@@ -1,80 +1,51 @@
-import { CalendarDays, Grid3X3, List, Tag, Trash2 } from "lucide-react";
-import { useContext, useState } from "react";
-import { TransactionContext } from "../contexts/TransactionContext";
+import { CalendarDays, Tag, Trash2, Pencil } from "lucide-react";
+import { useState } from "react";
+import { useTransactions } from "../contexts/TransactionContext";
 import { currencyFormatter, dateFormatter } from "../utils/formatter";
-import { useIsMobile } from "../hooks/use-mobile";
+import { DeleteTransactionModal } from "./DeleteTransactionModal";
+import { Transaction } from "@/services/transactionService";
+import { EditTransactionModal } from "./EditTransactionModal";
+import { Skeleton } from "./ui/skeleton";
+interface TransactionToDelete {
+  id: number;
+  description: string;
+}
 
 export const TransactionsTable = () => {
-  const { filteredTransactions: transactions, deleteTransaction } = useContext(TransactionContext);
-  const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
-  const isMobile = useIsMobile();
+  const { 
+    transactions, 
+    deleteTransaction,
+    isLoading,
+  } = useTransactions();
 
-  const effectiveViewMode = isMobile ? "grid" : viewMode;
+  const [transactionToDelete, setTransactionToDelete] = useState<TransactionToDelete | null>(null);
+  const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
 
   const incomeTransactions = transactions.filter(transaction => transaction.type === "income");
   const outcomeTransactions = transactions.filter(transaction => transaction.type === "outcome");
 
-  const renderTransactionsList = (transactionList: any[], title: string, isIncome: boolean) => (
-    <div className="mb-8">
-      <h2 className={`text-lg font-medium mb-3 ${isIncome ? "text-finance-income" : "text-finance-expense"}`}>
-        {title} ({transactionList.length})
-      </h2>
-      
-      {transactionList.length > 0 ? (
-        <div className="grid gap-3 md:gap-4">
-          {transactionList.map((transaction) => (
-            <div 
-              key={transaction.id} 
-              className="card-finance animate-fade-in p-4 md:p-6"
-            >
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
-                <div className="flex-1">
-                  <p className="font-medium mb-1 line-clamp-1">{transaction.description}</p>
-                  <p className={`text-xl font-semibold ${isIncome ? "text-finance-income" : "text-finance-expense"}`}>
-                    {!isIncome && "- "}
-                    {currencyFormatter.format(transaction.amount)}
-                  </p>
-                </div>
-                
-                <div className="flex flex-row md:flex-col justify-between md:items-end gap-2 text-finance-muted text-sm">
-                  <div className="flex items-center gap-1">
-                    <Tag className="w-3 h-3 md:w-4 md:h-4" />
-                    <span className="line-clamp-1">{transaction.category}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-1">
-                    <CalendarDays className="w-3 h-3 md:w-4 md:h-4" />
-                    <span>{dateFormatter.format(new Date(transaction.createdAt))}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-3 md:mt-4 flex justify-end">
-                <button 
-                  onClick={() => deleteTransaction(transaction.id)}
-                  className="text-finance-muted hover:text-finance-expense transition-colors p-1 rounded-full hover:bg-finance-expense/10"
-                  aria-label="Excluir transação"
-                  title="Excluir transação"
-                >
-                  <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="py-4 text-center text-finance-muted animate-fade-in">
-          <p>Nenhuma transação encontrada</p>
-        </div>
-      )}
-    </div>
-  );
+  const handleDeleteClick = (transaction: TransactionToDelete) => {
+    setTransactionToDelete(transaction);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (transactionToDelete !== null) {
+      await deleteTransaction(transactionToDelete.id);
+      setTransactionToDelete(null);
+    }
+  };
+
+  const handleEditClick = (transaction: Transaction) => {
+    setTransactionToEdit(transaction);
+  };
 
   const renderTransactionsGrid = (transactionList: any[], title: string, isIncome: boolean) => (
     <div className="mb-8">
       <h2 className={`text-lg font-medium mb-3 ${isIncome ? "text-finance-income" : "text-finance-expense"}`}>
         {title} ({transactionList.length})
       </h2>
+
+      {/* <TransactionList /> */}
       
       {transactionList.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
@@ -85,15 +56,27 @@ export const TransactionsTable = () => {
             >
               <div className="flex-1">
                 <div className="flex justify-between items-start mb-3">
-                  <p className="font-medium line-clamp-1 flex-1">{transaction.description}</p>
-                  <button 
-                    onClick={() => deleteTransaction(transaction.id)}
-                    className="text-finance-muted hover:text-finance-expense transition-colors p-1 rounded-full hover:bg-finance-expense/10 ml-2"
-                    aria-label="Excluir transação"
-                    title="Excluir transação"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <p className="font-medium line-clamp-1 flex-1">
+                    {transaction.description}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <button 
+                      onClick={() => handleEditClick(transaction)}
+                      className="text-finance-muted hover:text-finance-income transition-colors p-1 rounded-full hover:bg-finance-income/10"
+                      aria-label="Editar transação"
+                      title="Editar transação"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteClick({ id: transaction.id, description: transaction.description })}
+                      className="text-finance-muted hover:text-finance-expense transition-colors p-1 rounded-full hover:bg-finance-expense/10"
+                      aria-label="Excluir transação"
+                      title="Excluir transação"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 
                 <p className={`text-xl font-semibold mb-4 ${isIncome ? "text-finance-income" : "text-finance-expense"}`}>
@@ -110,7 +93,7 @@ export const TransactionsTable = () => {
                 
                 <div className="flex items-center gap-1">
                   <CalendarDays className="w-3 h-3" />
-                  <span>{dateFormatter.format(new Date(transaction.createdAt))}</span>
+                  <span>{new Date(transaction.created_at).toLocaleDateString("pt-BR")}</span>
                 </div>
               </div>
             </div>
@@ -124,51 +107,54 @@ export const TransactionsTable = () => {
     </div>
   );
 
-  return (
-    <div className="w-full max-w-7xl mx-auto mt-4 md:mt-6 px-4 md:px-8 pb-16">
-      {transactions.length > 0 && !isMobile && (
-        <div className="flex items-center justify-end mb-4">
-          <div className="bg-finance-card rounded-lg p-1 flex">
-            <button
-              onClick={() => setViewMode("list")}
-              className={`p-1.5 rounded ${effectiveViewMode === "list" ? "bg-finance-income/20" : ""}`}
-              aria-label="Visualização em lista"
-              title="Visualização em lista"
-            >
-              <List className={`w-4 h-4 ${effectiveViewMode === "list" ? "text-finance-income" : "text-finance-muted"}`} />
-            </button>
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`p-1.5 rounded ${effectiveViewMode === "grid" ? "bg-finance-income/20" : ""}`}
-              aria-label="Visualização em grid"
-              title="Visualização em grid"
-            >
-              <Grid3X3 className={`w-4 h-4 ${effectiveViewMode === "grid" ? "text-finance-income" : "text-finance-muted"}`} />
-            </button>
-          </div>
-        </div>
-      )}
-      
-      <div className="overflow-hidden">
-        {transactions.length > 0 ? (
-          effectiveViewMode === "list" ? (
-            <div>
-              {renderTransactionsList(incomeTransactions, "Entradas", true)}
-              {renderTransactionsList(outcomeTransactions, "Saídas", false)}
+  if (isLoading) {
+    return (
+      <div className="w-full max-w-7xl mx-auto mt-4 md:mt-6 px-4 md:px-8 pb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="card-finance animate-fade-in p-4 md:p-5 h-full flex flex-col">
+            <div className="space-y-2">
+              <Skeleton className="h-5 w-[250px]" />
+              <Skeleton className="h-3 w-[200px]" />
             </div>
-          ) : (
+          </div>
+        ))}
+        </div>
+        
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="w-full max-w-7xl mx-auto mt-4 md:mt-6 px-4 md:px-8 pb-16">
+        <div className="overflow-hidden">
+          {transactions.length > 0 ? (
             <div>
               {renderTransactionsGrid(incomeTransactions, "Entradas", true)}
               {renderTransactionsGrid(outcomeTransactions, "Saídas", false)}
             </div>
-          )
-        ) : (
-          <div className="py-12 md:py-16 text-center text-finance-muted animate-fade-in">
-            <p className="text-lg">Nenhuma transação encontrada</p>
-            <p className="mt-2">Adicione uma nova transação para começar</p>
-          </div>
-        )}
+          ) : (
+            <div className="py-12 md:py-16 text-center text-finance-muted animate-fade-in">
+              <p className="text-lg">Nenhuma transação encontrada</p>
+              <p className="mt-2">Adicione uma nova transação para começar</p>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      <DeleteTransactionModal 
+        isOpen={transactionToDelete !== null}
+        onClose={() => setTransactionToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        transactionDescription={transactionToDelete?.description || ""}
+      />
+
+      <EditTransactionModal
+        isOpen={transactionToEdit !== null}
+        onClose={() => setTransactionToEdit(null)}
+        currentTransaction={transactionToEdit}
+      />
+    </>
   );
 };

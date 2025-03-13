@@ -1,11 +1,10 @@
 
-import { ArrowDown, ArrowUp, DollarSign } from "lucide-react";
-import { useContext } from "react";
-import { TransactionContext } from "../contexts/TransactionContext";
+import { ArrowDownCircle, ArrowUpCircle, CircleDollarSign } from "lucide-react";
+import { useTransactions } from "../contexts/TransactionContext";
 import { currencyFormatter } from "../utils/formatter";
 
 export const Summary = () => {
-  const { transactions } = useContext(TransactionContext);
+  const { transactions } = useTransactions();
   
   const summary = transactions.reduce(
     (acc, transaction) => {
@@ -26,13 +25,14 @@ export const Summary = () => {
   );
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4 -mt-16 sm:-mt-20">
+    <section className="w-full max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4 -mt-16 sm:-mt-20">
+      
       <div className="card-finance animate-slide-up" style={{ animationDelay: "0ms" }}>
         <div className="flex items-start justify-between mb-3">
           <span className="text-finance-muted">Entradas</span>
-          <ArrowUp className="text-finance-income h-5 w-5" />
+          <ArrowUpCircle className="text-finance-income size-5 md:size-6" />
         </div>
-        <strong className="text-2xl md:text-3xl font-medium block">
+        <strong className="text-xl md:text-3xl font-medium block">
           {currencyFormatter.format(summary.income)}
         </strong>
       </div>
@@ -40,19 +40,21 @@ export const Summary = () => {
       <div className="card-finance animate-slide-up" style={{ animationDelay: "100ms" }}>
         <div className="flex items-start justify-between mb-3">
           <span className="text-finance-muted">Saídas</span>
-          <ArrowDown className="text-finance-expense h-5 w-5" />
+          <ArrowDownCircle className="text-finance-expense size-5 md:size-6" />
         </div>
-        <strong className="text-2xl md:text-3xl font-medium block">
+        <strong className="text-xl md:text-3xl font-medium block">
           {currencyFormatter.format(summary.outcome)}
         </strong>
       </div>
+  
+      
 
-      <div className={`card-finance animate-slide-up ${summary.total >= 0 ? 'bg-finance-total' : 'bg-finance-expense/90'} sm:col-span-2 md:col-span-1`} style={{ animationDelay: "200ms" }}>
+      <div className={`card-finance animate-slide-up ${summary.total >= 0 ? 'bg-finance-total' : 'bg-finance-expense/90'} col-span-2 sm:col-span-2 md:col-span-1`} style={{ animationDelay: "200ms" }}>
         <div className="flex items-start justify-between mb-3">
           <span className="text-white/80">Total</span>
-          <DollarSign className="text-white h-5 w-5" />
+          <CircleDollarSign className="text-white size-5 md:size-6" />
         </div>
-        <strong className="text-2xl md:text-3xl font-medium block text-white">
+        <strong className="text-xl md:text-3xl font-medium block text-white">
           {currencyFormatter.format(summary.total)}
         </strong>
       </div>

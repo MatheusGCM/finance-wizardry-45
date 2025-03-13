@@ -1,69 +1,77 @@
-# Welcome to your Lovable project
+# Finance Wizardry (NoMoney)
 
-## Project info
+Um aplicativo moderno de controle financeiro pessoal desenvolvido com React e TypeScript.
 
-**URL**: https://lovable.dev/projects/4fbe4518-b4df-4102-9cfa-588e3de04676
+## Sobre o Projeto
 
-## How can I edit this code?
+Finance Wizardry é uma aplicação web para gerenciamento de finanças pessoais que permite aos usuários registrar, visualizar e gerenciar suas transações financeiras de forma intuitiva e eficiente.
 
-There are several ways of editing your application.
+### Funcionalidades Principais
 
-**Use Lovable**
+#### 1. Gerenciamento de Transações
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4fbe4518-b4df-4102-9cfa-588e3de04676) and start prompting.
+- **Registro de Transações**: Adicione entradas (receitas) e saídas (despesas) com descrição, valor, categoria e data.
+- **Edição de Transações**: Modifique detalhes de transações existentes.
+- **Exclusão de Transações**: Remova transações que não são mais necessárias.
 
-Changes made via Lovable will be committed automatically to this repo.
+#### 2. Visualização Financeira
 
-**Use your preferred IDE**
+- **Resumo Financeiro**: Visualize o total de entradas, saídas e saldo atual.
+- **Categorização**: Transações organizadas por tipo (entrada/saída) e categoria.
+- **Interface Intuitiva**: Cards visuais para fácil identificação de transações.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+#### 3. Busca e Filtragem
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Pesquisa de Transações**: Encontre transações específicas por descrição, categoria ou valor.
+- **Visualização Filtrada**: Veja apenas as transações que correspondem aos seus critérios de busca.
 
-Follow these steps:
+#### 4. Persistência de Dados
+
+- **Armazenamento Local**: Todas as transações são salvas no localStorage do navegador.
+- **Dados de Demonstração**: Exemplos iniciais para facilitar o primeiro uso.
+
+### Interface do Usuário
+
+- **Design Moderno**: Interface com tema escuro (dark mode) para conforto visual.
+- **Responsividade**: Adaptação perfeita para dispositivos móveis e desktop.
+- **Animações Suaves**: Transições e efeitos visuais para melhor experiência do usuário.
+
+## Tecnologias Utilizadas
+
+Este projeto foi construído com:
+
+- **React**: Biblioteca JavaScript para construção de interfaces.
+- **TypeScript**: Superset tipado de JavaScript.
+- **Vite**: Ferramenta de build rápida para desenvolvimento moderno.
+- **Tailwind CSS**: Framework CSS utilitário para design responsivo.
+- **shadcn-ui**: Componentes de UI reutilizáveis e acessíveis.
+- **React Context API**: Gerenciamento de estado global da aplicação.
+- **localStorage**: Persistência de dados no navegador.
+
+## Como Executar o Projeto
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Passo 1: Clone o repositório
+git clone <URL_DO_REPOSITÓRIO>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Passo 2: Navegue até o diretório do projeto
+cd finance-wizardry
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Passo 3: Instale as dependências necessárias
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Passo 4: Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Acesso Online
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Você pode acessar a versão online do projeto em: [Finance Wizardry](https://finance-wizardry-45.vercel.app/)
 
-**Use GitHub Codespaces**
+## Contribuição
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou enviar pull requests para melhorar o aplicativo.
 
-## What technologies are used for this project?
+## Licença
 
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/4fbe4518-b4df-4102-9cfa-588e3de04676) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+Este projeto está licenciado sob a licença MIT - veja o arquivo LICENSE para mais detalhes.
