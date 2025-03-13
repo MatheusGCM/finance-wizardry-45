@@ -1,53 +1,69 @@
-
+import { useTransactions } from "@/contexts/TransactionContext";
 import { ArrowDown, ArrowUp, X } from "lucide-react";
-import { useContext, useState } from "react";
-import { TransactionContext } from "../contexts/TransactionContext";
+import { useState } from "react";
 
-export const NewTransactionModal = () => {
-  const { isTransactionModalOpen, closeTransactionModal, createTransaction } = useContext(TransactionContext);
-  
+interface NewTransactionModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const NewTransactionModal = ({
+  isOpen,
+  onClose,
+}: NewTransactionModalProps) => {
+  const { addTransaction } = useTransactions();
   const [type, setType] = useState<"income" | "outcome">("income");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
-  
-  const handleCreateNewTransaction = (e: React.FormEvent) => {
+
+  const handleAddNewTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    createTransaction({
-      description,
-      amount: Number(amount),
-      category,
-      type,
-    });
-    
-    setType("income");
-    setDescription("");
-    setAmount("");
-    setCategory("");
-    closeTransactionModal();
+    try {
+      await addTransaction({
+        description,
+        amount: Number(amount),
+        category,
+        type,
+      });
+
+      setType("income");
+      setDescription("");
+      setAmount("");
+      setCategory("");
+
+      onClose();
+    } catch (error) {
+      console.error("Erro ao salvar transação:", error);
+    }
   };
-  
-  if (!isTransactionModalOpen) return null;
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 animate-fade-in px-4 md:px-0">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeTransactionModal} />
-      
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
       <div className="bg-finance-card rounded-xl p-5 md:p-8 w-full max-w-md relative z-10 animate-slide-up shadow-xl">
-        <button 
-          onClick={closeTransactionModal}
+        <button
+          type="button"
+          onClick={onClose}
           className="absolute top-3 right-3 md:top-4 md:right-4 text-finance-muted hover:text-finance-text"
         >
           <X className="h-5 w-5" />
         </button>
-        
-        <h2 className="text-xl font-semibold mb-5 md:mb-6">Nova transação</h2>
-        
-        <form onSubmit={handleCreateNewTransaction}>
+
+        <h2 className="text-xl font-semibold mb-5 md:mb-6">
+          {"Nova transação"}
+        </h2>
+
+        <form onSubmit={handleAddNewTransaction}>
           <div className="space-y-3 md:space-y-4">
             <div>
-              <input 
+              <input
                 type="text"
                 placeholder="Descrição"
                 required
@@ -56,9 +72,9 @@ export const NewTransactionModal = () => {
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
-            
+
             <div>
-              <input 
+              <input
                 type="number"
                 placeholder="Valor"
                 required
@@ -69,9 +85,9 @@ export const NewTransactionModal = () => {
                 step={0.01}
               />
             </div>
-            
+
             <div>
-              <input 
+              <input
                 type="text"
                 placeholder="Categoria"
                 required
@@ -80,41 +96,69 @@ export const NewTransactionModal = () => {
                 onChange={(e) => setCategory(e.target.value)}
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-3 md:gap-4 mt-4">
               <button
                 type="button"
                 className={`flex items-center justify-center gap-2 py-3 rounded-lg ${
-                  type === "income" 
-                    ? "bg-finance-income/20 border-2 border-finance-income" 
+                  type === "income"
+                    ? "bg-finance-income/20 border-2 border-finance-income"
                     : "bg-finance-card hover:bg-finance-income/10 border border-finance-card"
                 }`}
                 onClick={() => setType("income")}
               >
-                <ArrowUp className={`h-4 w-4 ${type === "income" ? "text-finance-income" : "text-finance-muted"}`} />
-                <span className={`text-sm ${type === "income" ? "text-finance-text" : "text-finance-muted"}`}>Entrada</span>
+                <ArrowUp
+                  className={`h-4 w-4 ${
+                    type === "income"
+                      ? "text-finance-income"
+                      : "text-finance-muted"
+                  }`}
+                />
+                <span
+                  className={`text-sm ${
+                    type === "income"
+                      ? "text-finance-text"
+                      : "text-finance-muted"
+                  }`}
+                >
+                  Entrada
+                </span>
               </button>
-              
+
               <button
                 type="button"
                 className={`flex items-center justify-center gap-2 py-3 rounded-lg ${
-                  type === "outcome" 
-                    ? "bg-finance-expense/20 border-2 border-finance-expense" 
+                  type === "outcome"
+                    ? "bg-finance-expense/20 border-2 border-finance-expense"
                     : "bg-finance-card hover:bg-finance-expense/10 border border-finance-card"
                 }`}
                 onClick={() => setType("outcome")}
               >
-                <ArrowDown className={`h-4 w-4 ${type === "outcome" ? "text-finance-expense" : "text-finance-muted"}`} />
-                <span className={`text-sm ${type === "outcome" ? "text-finance-text" : "text-finance-muted"}`}>Saída</span>
+                <ArrowDown
+                  className={`h-4 w-4 ${
+                    type === "outcome"
+                      ? "text-finance-expense"
+                      : "text-finance-muted"
+                  }`}
+                />
+                <span
+                  className={`text-sm ${
+                    type === "outcome"
+                      ? "text-finance-text"
+                      : "text-finance-muted"
+                  }`}
+                >
+                  Saída
+                </span>
               </button>
             </div>
           </div>
-          
-          <button 
+
+          <button
             type="submit"
             className="btn-finance w-full mt-5 md:mt-6 text-sm md:text-base"
           >
-            Cadastrar
+            {"Adicionar"}
           </button>
         </form>
       </div>
